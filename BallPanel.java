@@ -21,7 +21,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsConfiguration;
 
-public class BallPanel extends JPanel implements KeyListener, ActionListener{
+public class BallPanel extends JPanel implements KeyListener, ActionListener, MouseListener{
 	
 	JPanel panel;
 	JFrame window = new JFrame();
@@ -30,6 +30,17 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	
 	Bar bar;
 	Ball ball;
+	
+	int gameState;
+	boolean restart = false;
+	
+	int lives = 3;
+	int points = 0;
+
+	int blink = 0;
+	
+	JButton yes;
+	
 	
 	public BallPanel() {
 		window.setSize(800,800);  
@@ -54,11 +65,22 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 		ball = new Ball();
 		bar = new Bar();
 		
+		yes = new JButton("Yes!");
+		yes.addActionListener(new Listener_Yes());
+		yes.setVisible(false);
+		yes.setBounds(width/2, height+60, 30, 30);
+		
+		
+		
 		//window.add(panel);
 		window.setContentPane(this);		
 		window.setVisible(true);
+		window.add(yes);
 		window.addKeyListener(this);
+		window.addMouseListener(this);
+		window.setFocusable(true);
 		
+		gameState = 0;
 		
 		new Timer(5, this).start();
 		
@@ -69,7 +91,15 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	public void paintComponent(Graphics g)
 	   {
 	      super.paintComponent(g); 
-	      showBoard(g);					      
+	      if (restart)
+	    	  startNew();
+	      if (gameState == 0)
+	    	  showStart(g);
+	      if (gameState == 1)
+	    	  showBoard(g);				
+	      if (gameState == 2) 
+	    	  showEnd(g);
+	      
 	   }
 	
 	public void showBoard(Graphics g){
@@ -87,16 +117,60 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		
 		g.drawOval(bar.x(), bar.y(), bar.length(), bar.height());
+		g.fillOval(bar.x(), bar.y(), bar.length(), bar.height());
 		g.drawOval(ball.x(), ball.y(), ball.size(), ball.size());
 		g.setColor(Color.RED);
 		g.fillOval(ball.x(), ball.y(), ball.size(), ball.size());
 		
+		g.setColor(Color.red);
+		g.drawString("Lives: " + lives, 30, 30);
+		g.drawString("Score: " + points, 30, 60);
 		collision();
 		ball.move();
 		
 	
 	}
 	
+	public void showStart(Graphics g) {
+		int height = window.getHeight();
+		int width = window.getWidth();
+		
+		
+		if (blink/20%2 == 0) {
+			g.drawString("Click or press a button to start", height/2, width/2);
+		}
+		
+		blink++;
+	}
+	
+	public void showEnd(Graphics g) {
+		int height = window.getHeight();
+		int width = window.getWidth();
+		
+		g.drawString("Final Score: " + points, height/2, width/2);
+		g.drawString("Play Again?", height/2, width/2 + 30);
+		yes.setVisible(true);
+		
+	}
+	
+	public void startNew() {
+		int height = window.getHeight()/2;
+		int width = window.getWidth();
+		points = 0;
+		ball = new Ball();
+		bar.reset();
+		squares = new Block[10][10];
+		for (int i = 0; i < squares.length; i++) {
+			for (int j = 0; j < squares[0].length; j++) {
+				squares[i][j] = new Block(Color.blue, 0, i*(width/10), j*(height/10), (width/10), (height/10));
+			}
+		}
+		gameState = 0;
+		lives = 3;
+		yes.setVisible(false);
+		restart = false;
+		window.requestFocus();
+	}
 	public boolean collision() {
 		
 		
@@ -110,6 +184,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 							if (distance(box.x(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
 								calcAngRight();
 								box.status++;
+								points += 10;
 								break;
 							}
 						}
@@ -119,6 +194,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 							if (distance(box.x()+box.getWidth(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
 								calcAngLeft();
 								box.status++;
+								points += 10;
 								break;
 							}
 						}
@@ -128,11 +204,13 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 							if (distance(box.x()+k, box.y() + box.getHeight(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
 								calcAngTop();
 								box.status++;
+								points += 10;
 								break;
 							}
 							if (distance(box.x()+k, box.y(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
 								calcAngBottom();
 								box.status++;
+								points += 10;
 								break;
 							}
 						}
@@ -164,7 +242,11 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	           
 	    }
 	    if (ball.y()+ball.size() > window.getHeight()) {
-	    	calcAngBottom();
+	    	lives--;
+	    	ball = new Ball();
+	    	gameState = 0;
+	    	if (lives == 0 )
+	    		gameState = 2;
 	    	return true;
 	    }
 		
@@ -200,14 +282,15 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 
 
 	
-	/*public void mouseClicked(MouseEvent e) {
-		
+	public void mouseClicked(MouseEvent e) {
 	}
 
 
 	
 	public void mousePressed(MouseEvent e) {
-		
+		if (gameState == 0)
+			gameState = 1;
+		repaint();
 	}
 
 
@@ -223,11 +306,14 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 
 	public void mouseExited(MouseEvent e) {
 		
-	}*/
+	}
 
 
 	public void keyTyped(KeyEvent e) {
 		int key = e.getKeyCode();
+		
+		if (gameState == 0)
+			gameState = 1;
 
 	}
 
@@ -235,10 +321,12 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (key == e.VK_RIGHT) {
-			bar.moveRight(10);
+			if (bar.x() + bar.length() < window.getWidth())
+				bar.moveRight(20);
 		}
 		if (key == e.VK_LEFT) {
-			bar.moveLeft(10);
+			if (bar.x() > 0)
+				bar.moveLeft(20);
 		}
 		
 		
@@ -249,10 +337,12 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	public void keyReleased(KeyEvent e) {
 		int key = e.getKeyCode();
 		if (key == e.VK_RIGHT) {
-			bar.moveRight(10);
+			if (bar.x() + bar.length() < window.getWidth())
+				bar.moveRight(20);
 		}
 		if (key == e.VK_LEFT) {
-			bar.moveLeft(10);
+			if (bar.x() > 0)
+				bar.moveLeft(20);
 		}
 		
 		
@@ -263,6 +353,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		repaint();
 	}
+	
+	
 	
 	//scrapped collision 
 	
@@ -327,5 +419,15 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 		}
 		
 		*/
+	private class Listener_Yes implements ActionListener{
+
+		
+		public void actionPerformed(ActionEvent e) {
+			restart = true;
+		}
+		
+	
+
+	}
 
 }

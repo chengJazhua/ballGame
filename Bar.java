@@ -41,5 +41,10 @@ public class Bar {
 	public void moveRight(int right) {
 		locX += right;
 	}
+	
+	public void reset() {
+		locX = 300;
+		locY = 700;
+	}
 
 }

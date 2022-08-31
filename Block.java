@@ -8,20 +8,20 @@ public class Block {
 	int x;
 	int y;
 	int width;
-	int length;
+	int height;
 	
 	public Block() {
 		color = Color.BLUE;
 		status = 0;
 	}
 	
-	public Block(Color color, int status, int x, int y, int width, int length) {
+	public Block(Color color, int status, int x, int y, int width, int height) {
 		this.color = color;
 		this.status = status;
 		this.x = x;
 		this.y = y;
 		this.width = width;
-		this.length = length;
+		this.height = height;
 	}
 	
 	public void setStatus(int change) {
@@ -53,8 +53,8 @@ public class Block {
 		return width;
 	}
 	
-	public int getLength() {
-		return length;
+	public int getHeight() {
+		return height;
 	}
 	
 

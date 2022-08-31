@@ -12,7 +12,7 @@ public class Ball {
 		locX = 390;
 		locY = 665;
 		speed = 10;
-		angle = Math.PI/4;
+		angle = 3*Math.PI/4;
 	}
 	
 	public int x() {
