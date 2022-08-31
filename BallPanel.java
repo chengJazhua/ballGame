@@ -60,7 +60,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 		window.addKeyListener(this);
 		
 		
-		new Timer(3, this).start();
+		new Timer(5, this).start();
 		
 		repaint();
 	}
@@ -79,9 +79,9 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 			for (int j = 0; j < squares[0].length; j++) {
 				g.setColor(squares[i][j].getColor());
 				if (squares[i][j].getStatus() == 0) {
-					g.fillRect(squares[i][j].x(), squares[i][j].y(), squares[i][j].getWidth(), squares[i][j].getLength());
+					g.fillRect(squares[i][j].x(), squares[i][j].y(), squares[i][j].getWidth(), squares[i][j].getHeight());
 					g.setColor(Color.black);
-					g.drawRect(squares[i][j].x(), squares[i][j].y(), squares[i][j].getWidth(), squares[i][j].getLength());
+					g.drawRect(squares[i][j].x(), squares[i][j].y(), squares[i][j].getWidth(), squares[i][j].getHeight());
 				}
 			}
 		}
@@ -99,15 +99,49 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	
 	public boolean collision() {
 		
-		for (int i = 0; i < squares.length; i++) {
-			for (int j = 0; j < squares.length; j++) {
+		
+		
+		for (int i = squares.length-1; i >= 0 ; i--) {
+			for (int j = squares[0].length-1; j >= 0; j--) {
 				Block box = squares[i][j];
-				
-				
+				if (box.status == 0) {
+					if (ball.x()+ball.size() < box.x() && ball.y() > box.y() && ball.y() < box.y() + box.getHeight()) {
+						for (int k = ball.size(); k < box.getHeight(); k++) {
+							if (distance(box.x(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
+								calcAngRight();
+								box.status++;
+								break;
+							}
+						}
+					}
+					else if (ball.x()+ball.size() > box.x() && ball.y() > box.y() && ball.y() < box.y() + box.getHeight()) {
+						for (int k = ball.size(); k < box.getHeight(); k++) {
+							if (distance(box.x()+box.getWidth(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
+								calcAngLeft();
+								box.status++;
+								break;
+							}
+						}
+					}
+					else {
+						for (int k = ball.size(); k < box.getWidth()-ball.size(); k++) {
+							if (distance(box.x()+k, box.y() + box.getHeight(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
+								calcAngTop();
+								box.status++;
+								break;
+							}
+							if (distance(box.x()+k, box.y(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
+								calcAngBottom();
+								box.status++;
+								break;
+							}
+						}
+					}
+				}
 			}
 		}
 		
-		for (int i = ball.size(); i < bar.x()-ball.size(); i++){
+		for (int i = ball.size(); i < bar.length()-ball.size(); i++){
             if (distance((bar.x()+i), bar.y(), ball.x(), ball.y()) < ball.size()){
                calcAngBottom();
                
@@ -117,17 +151,21 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 		
 		if (ball.y() < 0 ){
 	        calcAngTop();
+	        return true;
 	          
 	    }
 		if (ball.x() < 0 ) {
 			calcAngLeft();
+			return true;
 		}
-	    if (ball.x() > window.getWidth()){
+	    if (ball.x()+ball.size() > window.getWidth()){
 	        calcAngRight();
+	        return true;
 	           
 	    }
-	    if (ball.y() > window.getHeight()) {
+	    if (ball.y()+ball.size() > window.getHeight()) {
 	    	calcAngBottom();
+	    	return true;
 	    }
 		
 		
@@ -136,7 +174,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	
 	
 	public void calcAngTop() {
-		ball.setAng(Math.abs(randomAng(Math.PI*1.9, Math.PI*2)- ball.getAng()));
+		ball.setAng((randomAng(0, .08) - ball.getAng()));
 	}
 	
 	public void calcAngLeft() {
@@ -148,7 +186,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	}
 	
 	public void calcAngBottom() {
-		ball.setAng((randomAng(0, .05) - ball.getAng()));
+		ball.setAng((randomAng(0, .08) - ball.getAng()));
 	}
 	
 	public double randomAng(double min, double max) {
