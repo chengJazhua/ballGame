@@ -109,19 +109,25 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 		
 		for (int i = ball.size(); i < bar.x()-ball.size(); i++){
             if (distance((bar.x()+i), bar.y(), ball.x(), ball.y()) < ball.size()){
-               calcAngBar();
+               calcAngBottom();
                
                return true;
             }
          }
 		
-		if (ball.x() < 0 || ball.x() > window.getWidth() ){
-	        calcAngBar();
+		if (ball.y() < 0 ){
+	        calcAngTop();
 	          
 	    }
-	    if (ball.y() < 0 || ball.y() > window.getHeight()){
-	        calcAngSide();
+		if (ball.x() < 0 ) {
+			calcAngLeft();
+		}
+	    if (ball.x() > window.getWidth()){
+	        calcAngRight();
 	           
+	    }
+	    if (ball.y() > window.getHeight()) {
+	    	calcAngBottom();
 	    }
 		
 		
@@ -129,12 +135,20 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 	}
 	
 	
-	public void calcAngSide() {
+	public void calcAngTop() {
 		ball.setAng(Math.abs(randomAng(Math.PI*1.9, Math.PI*2)- ball.getAng()));
 	}
 	
-	public void calcAngBar() {
-		ball.setAng(Math.abs(randomAng(Math.PI*.95, Math.PI) - ball.getAng()));
+	public void calcAngLeft() {
+		ball.setAng((randomAng(Math.PI*.95, Math.PI)- ball.getAng()));
+	}
+	
+	public void calcAngRight() {
+		ball.setAng(randomAng(Math.PI*.95, Math.PI) - ball.getAng());
+	}
+	
+	public void calcAngBottom() {
+		ball.setAng((randomAng(0, .05) - ball.getAng()));
 	}
 	
 	public double randomAng(double min, double max) {
@@ -189,7 +203,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 			bar.moveLeft(10);
 		}
 		
-		repaint();
+		
 	}
 
 
@@ -203,7 +217,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener{
 			bar.moveLeft(10);
 		}
 		
-		repaint();
+		
 	}
 
 
