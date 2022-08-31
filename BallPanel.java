@@ -41,6 +41,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	
 	JButton yes;
 	
+	int level = 1;
 	
 	public BallPanel() {
 		window.setSize(800,800);  
@@ -55,12 +56,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		int height = window.getHeight()/2;
 		int width = window.getWidth();
 		
-		squares = new Block[10][10];
-		for (int i = 0; i < squares.length; i++) {
-			for (int j = 0; j < squares[0].length; j++) {
-				squares[i][j] = new Block(Color.blue, 0, i*(width/10), j*(height/10), (width/10), (height/10));
-			}
-		}
+		squares = new Block[1][5];
+		makeBoxes(squares.length, squares[0].length, width/squares[0].length, height/squares.length);
 		
 		ball = new Ball();
 		bar = new Bar();
@@ -99,22 +96,35 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	    	  showBoard(g);				
 	      if (gameState == 2) 
 	    	  showEnd(g);
+	      if (gameState == 3) 
+	    	  nextLevel(g);
+	      
 	      
 	   }
 	
 	public void showBoard(Graphics g){
 		
 		
+		int squaresLeft = 0;
 		for (int i = 0; i < squares.length; i++) {
 			for (int j = 0; j < squares[0].length; j++) {
-				g.setColor(squares[i][j].getColor());
-				if (squares[i][j].getStatus() == 0) {
-					g.fillRect(squares[i][j].x(), squares[i][j].y(), squares[i][j].getWidth(), squares[i][j].getHeight());
+				Block box = squares[i][j];
+				box.setColor(new Color(box.getStatus()*30, box.getStatus()*30, box.getStatus()*30));
+				g.setColor(box.getColor());
+				if (squares[i][j].getStatus() > 0) {
+					squaresLeft++;
+					g.fillRect(box.x(), box.y(), box.getWidth(), box.getHeight());
 					g.setColor(Color.black);
-					g.drawRect(squares[i][j].x(), squares[i][j].y(), squares[i][j].getWidth(), squares[i][j].getHeight());
+					g.drawRect(box.x(), box.y(), box.getWidth(), box.getHeight());
 				}
 			}
 		}
+		
+		if (squaresLeft == 0) {
+			gameState = 3;
+			level++;
+		}
+		squaresLeft = 0;
 		
 		g.drawOval(bar.x(), bar.y(), bar.length(), bar.height());
 		g.fillOval(bar.x(), bar.y(), bar.length(), bar.height());
@@ -125,8 +135,10 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		g.setColor(Color.red);
 		g.drawString("Lives: " + lives, 30, 30);
 		g.drawString("Score: " + points, 30, 60);
+		ball.setSpeed(7 + 1.25*(points/100));
 		collision();
 		ball.move();
+		
 		
 	
 	}
@@ -156,20 +168,26 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	public void startNew() {
 		int height = window.getHeight()/2;
 		int width = window.getWidth();
-		points = 0;
+		if (restart)
+			points = 0;
 		ball = new Ball();
 		bar.reset();
-		squares = new Block[10][10];
-		for (int i = 0; i < squares.length; i++) {
-			for (int j = 0; j < squares[0].length; j++) {
-				squares[i][j] = new Block(Color.blue, 0, i*(width/10), j*(height/10), (width/10), (height/10));
-			}
-		}
+		makeBoxes(squares.length, squares[0].length, width/squares[0].length, height/squares.length);
 		gameState = 0;
 		lives = 3;
 		yes.setVisible(false);
 		restart = false;
 		window.requestFocus();
+	}
+	
+	public void nextLevel(Graphics g) {
+		
+		
+		
+		int height = window.getHeight();
+		int width = window.getWidth();
+		g.drawString("Level Completed! Click to continue", height/2, width/2);
+		
 	}
 	public boolean collision() {
 		
@@ -178,12 +196,12 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		for (int i = squares.length-1; i >= 0 ; i--) {
 			for (int j = squares[0].length-1; j >= 0; j--) {
 				Block box = squares[i][j];
-				if (box.status == 0) {
+				if (box.status > 0) {
 					if (ball.x()+ball.size() < box.x() && ball.y() > box.y() && ball.y() < box.y() + box.getHeight()) {
 						for (int k = ball.size(); k < box.getHeight(); k++) {
 							if (distance(box.x(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
 								calcAngRight();
-								box.status++;
+								box.status--;
 								points += 10;
 								break;
 							}
@@ -193,7 +211,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 						for (int k = ball.size(); k < box.getHeight(); k++) {
 							if (distance(box.x()+box.getWidth(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
 								calcAngLeft();
-								box.status++;
+								box.status--;
 								points += 10;
 								break;
 							}
@@ -203,13 +221,13 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 						for (int k = ball.size(); k < box.getWidth()-ball.size(); k++) {
 							if (distance(box.x()+k, box.y() + box.getHeight(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
 								calcAngTop();
-								box.status++;
+								box.status--;
 								points += 10;
 								break;
 							}
 							if (distance(box.x()+k, box.y(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
 								calcAngBottom();
-								box.status++;
+								box.status--;
 								points += 10;
 								break;
 							}
@@ -254,6 +272,16 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		return false;
 	}
 	
+	public void makeBoxes(int rows, int cols, int width, int height) {
+		squares = new Block[rows][cols];
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				int status = (int)(Math.random()*(level))+1;
+				Color color = new Color(status*30, status*30, status*30);
+				squares[i][j] = new Block(color, status, j*(width), i*(height), (width), (height));
+			}
+		}
+	}
 	
 	public void calcAngTop() {
 		ball.setAng((randomAng(0, .08) - ball.getAng()));
@@ -290,7 +318,10 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	public void mousePressed(MouseEvent e) {
 		if (gameState == 0)
 			gameState = 1;
+		if (gameState == 3)
+			startNew();
 		repaint();
+		
 	}
 
 
@@ -314,6 +345,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		if (gameState == 0)
 			gameState = 1;
+		if (gameState == 3)
+			startNew();
 
 	}
 
@@ -325,7 +358,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 				bar.moveRight(20);
 		}
 		if (key == e.VK_LEFT) {
-			if (bar.x() > 0)
+			if (bar.x() > -20)
 				bar.moveLeft(20);
 		}
 		

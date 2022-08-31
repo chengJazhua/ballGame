@@ -1,7 +1,7 @@
 package ballGame;
 
 public class Ball {
-	int speed;
+	double speed;
 	double angle;
 	int locX; 
 	int size;
@@ -11,7 +11,7 @@ public class Ball {
 		size = 20;
 		locX = 390;
 		locY = 665;
-		speed = 10;
+		speed = 5;
 		angle = 3*Math.PI/4;
 	}
 	
@@ -36,8 +36,16 @@ public class Ball {
 		return angle;
 	}
 	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	
 	public void setAng(double ang) {
 		angle = ang;
+	}
+	
+	public void reset() {
+		
 	}
 
 }
