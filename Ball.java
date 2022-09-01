@@ -15,11 +15,11 @@ public class Ball {
 		angle = 3*Math.PI/4;
 	}
 	
-	public Ball(double angle) {
+	public Ball(double angle, double speed) {
 		size = 20;
 		locX = 390;
 		locY = 665;
-		speed = 5;
+		this.speed = speed;
 		this.angle = angle;
 	}
 	

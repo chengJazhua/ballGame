@@ -42,6 +42,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	int blink = 0;
 	
 	JButton yes;
+	JButton newGame;
+	
 	
 	int level = 1;
 	
@@ -67,23 +69,31 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		power = new ArrayList<Powerups>();
 		
+		newGame = new JButton("New Game");
+		newGame.addActionListener(new Listener_NewGame());
+		newGame.setVisible(true);
 		
 		yes = new JButton("Yes!");
 		yes.addActionListener(new Listener_Yes());
 		yes.setVisible(false);
+		
+		
+		panel.add(yes);
+		panel.add(newGame);
+		
 		yes.setBounds(width/2, height+60, 30, 30);
+		newGame.setBounds(width/2, height+30, 30,30);
+
 		
-		
-		
-		//window.add(panel);
-		window.setContentPane(this);		
+		window.setContentPane(this);	
+		window.add(panel);
 		window.setVisible(true);
-		window.add(yes);
+		
 		window.addKeyListener(this);
 		window.addMouseListener(this);
 		window.setFocusable(true);
 		
-		gameState = 0;
+		gameState = 4;
 		
 		new Timer(5, this).start();
 		
@@ -104,9 +114,17 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	    	  showEnd(g);
 	      if (gameState == 3) 
 	    	  nextLevel(g);
+	      if (gameState == 4)
+	    	  showTitle(g);
 	      
 	      
 	   }
+	
+	public void showTitle(Graphics g) {
+		int height = window.getHeight();
+		int width = window.getWidth();
+		g.drawString("Welcome to Ball!", height/2, width/2);
+	}
 	
 	public void showBoard(Graphics g){
 		
@@ -139,7 +157,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			
 			if (powCollision(pow)) {
 				if (pow.getType() == "moreBalls") {
-					balls.add(new Ball(Math.random()*(Math.PI/2)));
+					balls.add(new Ball(Math.random()*(Math.PI/2), balls.get(0).getSpeed()));
 				}
 				else if (pow.getType() == "longBar") {
 					bar.setLength(bar.getLength() + 25);
@@ -211,7 +229,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		g.drawString("Play Again?", height/2, width/2 + 30);
 		yes.setVisible(true);
 		level = 1;
-		
+		panel.setVisible(true);
 	}
 	
 	public void startNew() {
@@ -363,10 +381,13 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			for (int i = 0; i < rows; i++) {
 				for (int j = 0; j < cols; j++) {
 					int status = (int)(Math.random()*(level+1));
-					if (status > 0)
+					if (status > 0 && squares[i][j] == null) {
 						numSq++;
-					Color color = new Color(status*30, status*30, status*30);
-					squares[i][j] = new Block(color, status, j*(width), i*(height), (width), (height));
+						Color color = new Color((int)(Math.random()*31)+(status-1)*30, (int)(Math.random()*31)+(status-1)*30, (int)(Math.random()*31)+(status-1)*30);
+						squares[i][j] = new Block(color, status, j*(width), i*(height), (width), (height));
+					}
+					else
+						squares[i][j] = new Block(Color.white, status, j*(width), i*(height), (width), (height));
 				}
 			}
 		}
@@ -542,14 +563,17 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		*/
 	private class Listener_Yes implements ActionListener{
-
-		
 		public void actionPerformed(ActionEvent e) {
 			restart = true;
 		}
-		
-	
 
 	}
+	private class Listener_NewGame implements ActionListener{
+		public void actionPerformed(ActionEvent e) {
+			gameState = 1;
+			newGame.setVisible(false);
+			panel.setVisible(false);
+		}
 
+	}
 }
