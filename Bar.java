@@ -2,6 +2,8 @@ package ballGame;
 
 import java.awt.Image;
 
+import javax.swing.ImageIcon;
+
 public class Bar {
 	
 	int locX;
@@ -14,7 +16,9 @@ public class Bar {
 		locX = 300;
 		locY = 700;
 		length = 200;
-		height = 25;
+		height = 40;
+		//ImageIcon x = new ImageIcon(this.getClass().getResource("s.jpg"));
+	    //image = x.getImage();
 		
 	}
 	
@@ -39,6 +43,10 @@ public class Bar {
 	}
 	public int getLength() {
 		return length;
+	}
+	
+	public Image getImage() {
+		return image;
 	}
 	
 	public void moveLeft(int left) {

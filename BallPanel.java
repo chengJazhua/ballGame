@@ -130,7 +130,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			Powerups pow = power.get(i);
 			g.setColor(Color.black);
 			g.drawRect(pow.x(), pow.y(), pow.getSize(), pow.getSize());
-			g.setColor(Color.blue);
+			g.setColor(pow.getColor());
 			g.fillRect(pow.x(), pow.y(), pow.getSize(), pow.getSize());
 			if (pow.y() > window.getHeight()) {
 				power.remove(i);
@@ -166,6 +166,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		g.setColor(Color.black);
 		g.drawOval(bar.x(), bar.y(), bar.length(), bar.height());
 		g.fillOval(bar.x(), bar.y(), bar.length(), bar.height());
+		//g.drawImage(bar.getImage(), bar.x(), bar.y(), bar.length(), bar.height(), null);
 		
 		for (int i = 0; i < balls.size(); i++) {
 			Ball ball = balls.get(i);
@@ -242,15 +243,19 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		if (random < 10) {
 			String type = "";
+			Color color = null;
 			switch ((int)(Math.random()*3)+1) {
 				case (1): type = "moreBalls";
+					color = Color.red;
 					break;
 				case (2): type = "longBar";
+					color = Color.blue;
 					break;
 				case (3): type = "slowBall";
+					color = Color.green;
 					break;
 			}
-			power.add(new Powerups(window.getWidth(), type));
+			power.add(new Powerups(window.getWidth(), type, color));
 		}
 	}
 	public boolean powCollision(Powerups pow) {
