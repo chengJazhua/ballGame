@@ -24,7 +24,7 @@ import java.awt.GraphicsConfiguration;
 public class BallPanel extends JPanel implements KeyListener, ActionListener, MouseListener{
 	
 	JPanel panel;
-	JFrame window = new JFrame();
+	JFrame window;
 	
 	Block[][] squares;
 	
@@ -48,10 +48,10 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	int level = 1;
 	
 	public BallPanel() {
+		window = new JFrame();
 		window.setSize(800,800);  
 		window.setLocation(1, 1);				         
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		window.setVisible(true);
 		window.setResizable(false);
 		
 		panel = new JPanel();
@@ -81,9 +81,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		panel.add(yes);
 		panel.add(newGame);
 		
-		yes.setBounds(width/2, height+60, 30, 30);
-		newGame.setBounds(width/2, height+30, 30,30);
-
+		
+		
 		
 		window.setContentPane(this);	
 		window.add(panel);
@@ -97,7 +96,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		new Timer(5, this).start();
 		
-		repaint();
+		
 	}
 	
 	
@@ -199,7 +198,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		g.setColor(Color.red);
 		g.drawString("Lives: " + lives, 30, 30);
 		g.drawString("Score: " + points, 30, 60);
-		
+		g.drawString("Level: " + level, 30, 90);
 		generatePower();
 		
 		
