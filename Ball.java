@@ -15,6 +15,14 @@ public class Ball {
 		angle = 3*Math.PI/4;
 	}
 	
+	public Ball(double angle) {
+		size = 20;
+		locX = 390;
+		locY = 665;
+		speed = 5;
+		this.angle = angle;
+	}
+	
 	public int x() {
 		return locX;
 	}
@@ -34,6 +42,10 @@ public class Ball {
 	
 	public double getAng() {
 		return angle;
+	}
+	
+	public double getSpeed() {
+		return speed;
 	}
 	
 	public void setSpeed(double speed) {

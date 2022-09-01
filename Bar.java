@@ -34,6 +34,13 @@ public class Bar {
 		return length;
 	}
 	
+	public void setLength(int length) {
+		this.length = length;
+	}
+	public int getLength() {
+		return length;
+	}
+	
 	public void moveLeft(int left) {
 		locX -= left;
 	}
@@ -45,6 +52,7 @@ public class Bar {
 	public void reset() {
 		locX = 300;
 		locY = 700;
+		length = 200;
 	}
 
 }
