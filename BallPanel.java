@@ -29,6 +29,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	JPanel panel;
 	JFrame window;
 	
+	Timer paint;
+	
 	Block[][] squares;
 	
 	Bar bar;
@@ -43,6 +45,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	boolean restart = false;
 	boolean ranOnce = false;
 	String[] leaderboard;
+	String name;
 	
 	int lives = 3;
 	int points = 0;
@@ -115,7 +118,12 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		window.setVisible(true);
 		
 		repaint();
-		new Timer(5, this).start();
+		paint = new Timer(5, new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				repaint();
+			}
+		});
+		paint.start();
 		
 		
 	}
@@ -240,6 +248,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			gameState = 3;
 			level++;
 			speedChange = 0;
+			squaresLeft = 0;
+			repaint();
 		}
 		squaresLeft = 0;
 		
@@ -324,9 +334,16 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
             	if (points > Integer.parseInt(split[1])) {
             		if (leader == false) {
             			leader = true;
-            			lead[count] = split[0] + " " + points + " You!";
+            			if (ranOnce != true) {
+            				
+            				paint.stop();
+            				name = JOptionPane.showInputDialog(window, "You placed on the leaderboard! \n Your name: ");
+            				
+            			}
+            			lead[count] = split[0] + " " + points + " " + name;
             			file += lead[count] + '\n';
             			count++;
+            			
             		}
             	}
             	if (count == 5)
@@ -336,6 +353,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
             	file += line + '\n';
   
             }
+            paint.start();
             new PrintWriter(f).close();
             bufferedWriter.write(file);
             reader.close();
@@ -429,64 +447,66 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	public void collision(Ball ball) {
 		int sides = 0;
 		int corner = 0;
-		for (int i = squares.length-1; i >= 0 ; i--) {
-			for (int j = squares[0].length-1; j >= 0; j--) {
-				Block box = squares[i][j];
-				if (box.status > 0) {
-					for (int k = 0; k < box.getHeight(); k++) { //left
-						if (distance(box.x(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
-							calcAngRight(ball);
-							sides++;
-							corner += 1;
-							break;
+		if (ball.y() < window.getHeight()/2+ball.size()) {
+			for (int i = squares.length-1; i >= 0 ; i--) {
+				for (int j = squares[0].length-1; j >= 0; j--) {
+					Block box = squares[i][j];
+					if (box.status > 0) {
+						for (int k = 0; k < box.getHeight(); k++) { //left
+							if (distance(box.x(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
+								calcAngRight(ball);
+								sides++;
+								corner += 1;
+								break;
+							}
 						}
-					}
 				
-					for (int k = 0; k < box.getHeight(); k++) { //right
-						if (distance(box.x()+box.getWidth(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
-							calcAngLeft(ball);
-							sides++;
-							corner += 10;
-							break;
+						for (int k = 0; k < box.getHeight(); k++) { //right
+							if (distance(box.x()+box.getWidth(), box.y()+k, ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()){
+								calcAngLeft(ball);
+								sides++;
+								corner += 10;
+								break;
+							}
 						}
-					}
 				
-					for (int k = 0; k < box.getWidth(); k++) { // bottom
-						if (distance(box.x()+k, box.y() + box.getHeight(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
-							calcAngTop(ball);
-							sides++;
-							corner += 100;
-							break;
+						for (int k = 0; k < box.getWidth(); k++) { // bottom
+							if (distance(box.x()+k, box.y() + box.getHeight(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
+								calcAngTop(ball);
+								sides++;
+								corner += 100;
+								break;
+							}
+							//top
+							if (distance(box.x()+k, box.y(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
+								calcAngBottom(ball);
+								sides++;
+								corner += 1000;
+								break;
+							}
 						}
-						//top
-						if (distance(box.x()+k, box.y(), ball.x()+ball.size()/2, ball.y()+ball.size()/2) < ball.size()) {
-							calcAngBottom(ball);
-							sides++;
-							corner += 1000;
-							break;
-						}
-					}
 					
-				}
-				if (sides > 0) {
-					box.setStatus(box.getStatus()-1);
-					points += 10;
-					if (sides > 1) {
-						double set = 0;
-						switch(corner) {
-							case (101): set = 5*Math.PI/4;
-								break;
-							case (1001): set = 3*Math.PI/4;
-								break;
-							case (110): set = 7*Math.PI/4;
-								break;
-							case (1010): set = Math.PI/4;
-								break;
-						}
-						ball.setAng(set);
-						
 					}
-					return;
+					if (sides > 0) {
+						box.setStatus(box.getStatus()-1);
+						points += 10;
+						if (sides > 1) {
+							double set = 0;
+							switch(corner) {
+								case (101): set = 5*Math.PI/4;
+									break;
+								case (1001): set = 3*Math.PI/4;
+									break;
+								case (110): set = 7*Math.PI/4;
+									break;
+								case (1010): set = Math.PI/4;
+									break;
+							}
+							ball.setAng(set);
+						
+						}
+						return;
+					}
 				}
 			}
 		}
