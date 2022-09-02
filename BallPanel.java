@@ -9,9 +9,11 @@ import javax.swing.Timer;
 import java.awt.image.*;
 import java.io.File;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.FileWriter;
 
 import javax.swing.border.*;
@@ -41,6 +43,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	
 	int gameState;
 	boolean restart = false;
+	boolean ranOnce = false;
+	String[] leaderboard;
 	
 	int lives = 3;
 	int points = 0;
@@ -223,6 +227,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		if (squaresLeft == 0) {
 			gameState = 3;
 			level++;
+			points += 100;
 		}
 		squaresLeft = 0;
 		
@@ -257,7 +262,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	public void showStart(Graphics g) {
 		int height = window.getHeight();
 		int width = window.getWidth();
-		
+		ranOnce = false;
 		
 		if (blink/20%2 == 0) {
 			g.drawString("Click or press a button to start", width/2, height/2);
@@ -269,26 +274,59 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	public void showEnd(Graphics g) {
 		int height = window.getHeight();
 		int width = window.getWidth();
-		
+		if (ranOnce != true) {
+			leaderboard = getLeader(g);
+		}
 		g.drawString("Final Score: " + points, width/2, height/2);
 		g.drawString("Play Again?", width/2, height/2 + 30);
+		
+		for (int i = 0; i < leaderboard.length; i++) {
+			g.drawString(leaderboard[i], 0, height/2 + 30*i);
+		}
+		yes.setVisible(true);
+		level = 1;
+		panel.setVisible(true);
+		ranOnce = true;
+	}
+	
+	public String[] getLeader(Graphics g) {
+		int height = window.getHeight();
+		int width = window.getWidth();
+		String[] lead = new String[5];
+		File f = new File("C:/Users/cheng/eclipse-workspace/project/src/ballGame/leaderboard");// put file path of leaderboard here
+		boolean leader = false;
+		String file = "";
 		try {
-            FileReader reader = new FileReader("C:/Users/cheng/eclipse-workspace/project/src/ballGame/leaderboard"); // put file path of leaderboard here
+            FileReader reader = new FileReader(f); 
             BufferedReader read = new BufferedReader(reader);
+            FileWriter writer = new FileWriter(f, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
             String line;
-            int place = 1;
+            int count = 0;
             while ((line = read.readLine()) != null) {
-                g.drawString(place + ": " + line, 0, height/2 + place*30);
-                place++;
+            	String[] split = line.split(" ");
+            	if (points > Integer.parseInt(split[1])) {
+            		if (leader == false) {
+            			leader = true;
+            			line = split[0] + " " + points + " You!";
+            		}
+            	}
+            	lead[count] = line;
+            	count++;
+            	file += line + '\n';
+  
             }
+            new PrintWriter(f).close();
+            bufferedWriter.write(file);
             reader.close();
+            read.close();
+            bufferedWriter.close();
+            writer.close();
  
         } catch (IOException e) {
             e.printStackTrace();
         }
-		yes.setVisible(true);
-		level = 1;
-		panel.setVisible(true);
+		return lead;
 	}
 	
 	public void startNew() {
@@ -586,6 +624,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		
 	}
+	
+	
 
 
 	
