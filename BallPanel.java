@@ -8,6 +8,11 @@ import javax.swing.Timer;
 
 import java.awt.image.*;
 import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+import java.io.IOException;
+import java.io.FileWriter;
 
 import javax.swing.border.*;
 
@@ -57,6 +62,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		panel = new JPanel();
 		
+
 		
 		int height = window.getHeight()/2;
 		int width = window.getWidth();
@@ -266,6 +272,20 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		g.drawString("Final Score: " + points, width/2, height/2);
 		g.drawString("Play Again?", width/2, height/2 + 30);
+		try {
+            FileReader reader = new FileReader("C:/Users/cheng/eclipse-workspace/project/src/ballGame/leaderboard"); // put file path of leaderboard here
+            BufferedReader read = new BufferedReader(reader);
+            String line;
+            int place = 1;
+            while ((line = read.readLine()) != null) {
+                g.drawString(place + ": " + line, 0, height/2 + place*30);
+                place++;
+            }
+            reader.close();
+ 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		yes.setVisible(true);
 		level = 1;
 		panel.setVisible(true);
