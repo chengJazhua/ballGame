@@ -32,6 +32,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	
 	ArrayList<Ball> balls;
 	ArrayList<Powerups> power;
+	ArrayList<Powerups> debuff;
 	
 	int gameState;
 	boolean restart = false;
@@ -68,6 +69,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		bar = new Bar();
 		
 		power = new ArrayList<Powerups>();
+		debuff = new ArrayList<Powerups>();
 		
 		newGame = new JButton("New Game");
 		newGame.addActionListener(new Listener_NewGame());
@@ -174,6 +176,44 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			
 		}
 		
+		for (int i = 0; i < debuff.size(); i++) {
+			Powerups pow = debuff.get(i);
+			g.setColor(Color.black);
+			g.drawRect(pow.x(), pow.y(), pow.getSize(), pow.getSize());
+			g.setColor(pow.getColor());
+			g.fillRect(pow.x(), pow.y(), pow.getSize(), pow.getSize());
+			if (pow.y() > window.getHeight()) {
+				debuff.remove(i);
+				i--;
+			}
+			
+			if (powCollision(pow)) {
+				if (pow.getType() == "moreBlocks") {
+					for (int j = 0; j < squares.length; j++) {
+						for (int k = 0; k < squares[0].length; k++) {
+							double roll = Math.random();
+							if (roll < .2)
+								squares[i][j].setStatus(squares[i][j].getStatus()+1);
+						}
+					
+					}
+				}
+				else if (pow.getType() == "shortBar") {
+					bar.setLength(bar.getLength() - 50);
+				}
+				else if (pow.getType() == "fastBall") {
+					for (int j = 0; j < balls.size(); j++)
+						balls.get(i).setSpeed(balls.get(i).getSpeed() + 2.0);
+				}
+				debuff.remove(i);
+				i--;
+				
+			}
+			pow.move();
+			
+			
+		}
+		
 		if (squaresLeft == 0) {
 			gameState = 3;
 			level++;
@@ -238,6 +278,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			points = 0;
 		balls = new ArrayList<Ball>();
 		power = new ArrayList<Powerups>();
+		debuff = new ArrayList<Powerups>();
 		balls.add(new Ball());
 		bar.reset();
 		makeBoxes(squares.length, squares[0].length, width/squares[0].length, height/squares.length);
@@ -245,6 +286,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		lives = 3;
 		yes.setVisible(false);
 		restart = false;
+		panel.setVisible(false);
 		window.requestFocus();
 	}
 	
@@ -273,6 +315,27 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 					break;
 			}
 			power.add(new Powerups(window.getWidth(), type, color));
+		}
+		
+		if (random > 2995) {
+			
+			String type = "";
+			Color color = null;
+			
+			switch ((int)(Math.random()*3)+1) {
+			case (1): type = "moreBlocks";
+				color = Color.black;
+				break;
+			case (2): type = "shortBar";
+				color = Color.darkGray;
+				break;
+			case (3): type = "fasterBall";
+				color = Color.lightGray;
+				break;
+			}
+			
+			debuff.add(new Powerups(window.getWidth(), type, color));
+			
 		}
 	}
 	public boolean powCollision(Powerups pow) {
@@ -349,7 +412,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 				}
 			}
 		}
-		if (ball.x()-ball.size()/2 > bar.x()) {
+		if (ball.y()-ball.size()/2 < bar.y()) {
 		for (int i = ball.size(); i < bar.length()-ball.size(); i++){
             if (distance((bar.x()+i), bar.y(), ball.x(), ball.y()) < ball.size()){
                calcAngBottom(ball);
