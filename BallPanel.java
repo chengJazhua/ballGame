@@ -329,6 +329,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
             			count++;
             		}
             	}
+            	if (count == 5)
+            		break;
             	lead[count] = line;
             	count++;
             	file += line + '\n';
