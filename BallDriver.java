@@ -1,6 +1,5 @@
 package ballGame;
 
-import java.io.File;
 
 public class BallDriver {
 	 public static BallPanel screen;

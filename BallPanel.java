@@ -1,7 +1,6 @@
 package ballGame;
 
-import java.awt.*;
-import java.util.*;
+
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -22,13 +21,10 @@ import java.util.TimerTask;
 import java.util.ArrayList; 
 import java.awt.Graphics;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Point;
-import java.awt.GraphicsEnvironment;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsConfiguration;
+
 
 public class BallPanel extends JPanel implements KeyListener, ActionListener, MouseListener{
+	
 	
 	JPanel panel;
 	JFrame window;
@@ -60,18 +56,24 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	int level = 1;
 	
 	public BallPanel() {
+		
+		
+		
 		window = new JFrame();
 		window.setSize(800,800);  
 		window.setLocation(1, 1);				         
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		
-		panel = new JPanel();
 		
-
+		panel = new JPanel();
 		
 		int height = window.getHeight()/2;
 		int width = window.getWidth();
+		
+
+		
+		
 		
 		squares = new Block[5][5];
 		makeBoxes(squares.length, squares[0].length, width/squares[0].length, height/squares.length);
@@ -100,7 +102,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		window.setContentPane(this);	
 		window.add(panel);
-		window.setVisible(true);
+		
 		
 		window.addKeyListener(this);
 		window.addMouseListener(this);
@@ -108,6 +110,11 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		
 		gameState = 4;
 		
+		
+		
+		window.setVisible(true);
+		
+		repaint();
 		new Timer(5, this).start();
 		
 		
@@ -637,78 +644,10 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	}
 	
 	
-
-
-	
 	public void actionPerformed(ActionEvent e) {
 		repaint();
 	}
 	
-	
-	
-	//scrapped collision 
-	
-	/*System.out.println(ball.y() + " " + box.y());
-	if (ball.y() < box.y()) {
-		if(box.status == 0 && distance(box.x()+box.getWidth()/2, box.y()+box.getLength()/2, 
-				ball.x()+ball.size()/2, ball.y() + ball.size()/2) <= ball.size/2 + box.width/2) {
-			calcAngSide();
-			squares[i][j].status += 1;
-			return true;
-		}
-		
-		if (ball.x() < box.x()) {
-			
-			for (int k = ball.size(); k < box.getWidth()-ball.size(); k++) {
-				if (distance(box.x(), box.y()+k, ball.x(), ball.y()) < ball.size()) {
-					calcAngSide();
-					squares[i][j].status += 1;
-					return true;
-				}
-			}
-			
-		}
-		
-		else if (ball.x() > box.x()+box.getLength()) {
-			for (int k = ball.size(); k < box.getWidth()-ball.size(); k++) {
-				if (distance(box.x()+box.getLength(), box.y()+k, ball.x(), ball.y()) < ball.size()) {
-					calcAngSide();
-					squares[i][j].status += 1;
-					return true;
-				}
-			}
-		}
-		else {
-			for (int k = ball.size(); k < box.getLength()-ball.size(); k++) {
-				if (distance(box.x()+k, box.y(), ball.x(), ball.y()) < ball.size()) {
-					calcAngBar();
-					squares[i][j].status += 1;
-					return true;
-				}
-			}
-			
-		}
-		
-		
-	}
-	else {
-		if(box.status == 0 && distance(box.x()+box.getWidth()/2, box.y()+box.getLength()/2, 
-				ball.x()+ball.size()/2, ball.y() + ball.size()/2) <= ball.size/2 + box.length/2) {
-			calcAngBar();
-			squares[i][j].status += 1;
-			System.out.println("idk bruh");
-			return true;
-		}
-		for (int k = 0; k < box.getLength()-ball.size(); k++) {
-			if (distance(box.x()+k, box.y()+box.getWidth(), ball.x(), ball.y()) < ball.size()) {
-				calcAngBar();
-				squares[i][j].status += 1;
-				System.out.println("hi");
-				return true;
-			}
-		}
-		
-		*/
 	private class Listener_Yes implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			restart = true;
