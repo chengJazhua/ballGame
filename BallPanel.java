@@ -41,6 +41,8 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	ArrayList<Powerups> power;
 	ArrayList<Powerups> debuff;
 	
+	int speedChange = 0;
+	
 	int gameState;
 	boolean restart = false;
 	boolean ranOnce = false;
@@ -174,8 +176,10 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 					bar.setLength(bar.getLength() + 25);
 				}
 				else if (pow.getType() == "slowBall") {
-					for (int j = 0; j < balls.size(); j++)
-						balls.get(i).setSpeed(balls.get(i).getSpeed() - 2.5);
+					if (7 + 1.25*(points/100) + speedChange > 2) {
+						for (int j = 0; j < balls.size(); j++)
+							speedChange -= .5;
+					}
 				}
 				power.remove(i);
 				i--;
@@ -209,11 +213,12 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 					}
 				}
 				else if (pow.getType() == "shortBar") {
-					bar.setLength(bar.getLength() - 50);
+					if (bar.getLength() > 80)
+						bar.setLength(bar.getLength() - 50);
 				}
 				else if (pow.getType() == "fastBall") {
 					for (int j = 0; j < balls.size(); j++)
-						balls.get(i).setSpeed(balls.get(i).getSpeed() + 2.0);
+						speedChange += 1;
 				}
 				debuff.remove(i);
 				i--;
@@ -227,7 +232,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		if (squaresLeft == 0) {
 			gameState = 3;
 			level++;
-			points += 100;
+			speedChange = 0;
 		}
 		squaresLeft = 0;
 		
@@ -241,7 +246,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 			g.drawOval(ball.x(), ball.y(), ball.size(), ball.size());
 			g.setColor(Color.RED);
 			g.fillOval(ball.x(), ball.y(), ball.size(), ball.size());
-			ball.setSpeed(7 + 1.25*(points/100));
+			ball.setSpeed(7 + 1.25*(points/100) + speedChange);
 			collision(ball);
 			ball.move();
 		}
@@ -262,6 +267,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 	public void showStart(Graphics g) {
 		int height = window.getHeight();
 		int width = window.getWidth();
+		
 		ranOnce = false;
 		
 		if (blink/20%2 == 0) {
@@ -287,6 +293,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
 		level = 1;
 		panel.setVisible(true);
 		ranOnce = true;
+		speedChange = 0;
 	}
 	
 	public String[] getLeader(Graphics g) {
@@ -304,11 +311,15 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
             String line;
             int count = 0;
             while ((line = read.readLine()) != null) {
+            	if (count == 5)
+            		break;
             	String[] split = line.split(" ");
             	if (points > Integer.parseInt(split[1])) {
             		if (leader == false) {
             			leader = true;
-            			line = split[0] + " " + points + " You!";
+            			lead[count] = split[0] + " " + points + " You!";
+            			file += lead[count] + '\n';
+            			count++;
             		}
             	}
             	lead[count] = line;
