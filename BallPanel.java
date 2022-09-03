@@ -340,7 +340,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
             				name = JOptionPane.showInputDialog(window, "You placed on the leaderboard! \n Your name: ");
             				
             			}
-            			lead[count] = split[0] + " " + points + " " + name;
+            			lead[count] = (count+1) + ": " + points + " " + name;
             			file += lead[count] + '\n';
             			count++;
             			
@@ -348,7 +348,7 @@ public class BallPanel extends JPanel implements KeyListener, ActionListener, Mo
             	}
             	if (count == 5)
             		break;
-            	lead[count] = line;
+            	lead[count] = (count+1) + ": " + split[1] + " " + split[2];
             	count++;
             	file += line + '\n';
   
